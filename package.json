@@ -1,0 +1,41 @@
+{
+  "name": "pokemon-erc721",
+  "version": "0.0.1",
+  "description": "Ethereum ERC721 contract sample",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "ganache": "ganache-cli --port 7545 -i 47",
+    "migrate:parity": "truffle migrate --network parity --reset",
+    "migrate:development": "truffle migrate --network development --reset",
+    "test:parity": "truffle test --network parity",
+    "test:development": "truffle test --network development",
+    "mint:parity": "truffle exec ./scripts/mint.js --network parity",
+    "mint:development": "truffle exec ./scripts/mint.js --network development"
+  },
+  "keywords": [
+    "ethereum",
+    "token",
+    "blockchain",
+    "erc721"
+  ],
+  "author": "andreafspeziale",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "ganache-cli": "^6.1.6",
+    "truffle": "^4.1.13"
+  },
+  "dependencies": {
+    "colors": "^1.3.1",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2",
+    "zeppelin-solidity": "1.11.0"
+  }
+}
