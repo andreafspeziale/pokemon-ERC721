@@ -2,14 +2,11 @@
 ERC721 is the Ethereum standard for non-fungible tokens.
 
 ## System used
-- node v9.10.1
-- npm 5.8.0
+- node v10.9.0
+- npm 6.2.0
 
 ## Install
 - `$ npm i`
-
-## Set env
-- `$ source set_path.sh`
 
 ## Network choices
 - development
@@ -30,4 +27,4 @@ ERC721 is the Ethereum standard for non-fungible tokens.
 ## Config
 The config folder contains a config file where you can specified for the parity network the receiver address of the minted tokens.
 
-Plus you can specify the range of avaiable pokemons.
+Plus you can specify the range of avaiable pokemons you want to mint.

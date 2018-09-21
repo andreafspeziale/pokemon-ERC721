@@ -1,63 +1,90 @@
 
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-chai.use(chaiAsPromised)
-const { expect, assert } = chai
+/* eslint no-undef: 1 */
+const config = require('../config/config')
 
-var Pokemon = artifacts.require("Pokemon");
+const Pokemon = artifacts.require('Pokemon')
 
-contract('Testing ERC721 contract', function(accounts) {
+contract('Testing ERC721 contract', async (accounts) => {
+  let token
+  const name = 'Pokemon'
+  const symbol = 'PKM'
 
-    let token;
-    const name = "Pokemon";
-    const symbol = "PKM"
+  const { uriUrl } = config.pokemon
 
-    const account1 = accounts[1]
-    const tokenId1 = 2;
-    const tokenUri1 = "Ivysaur";
+  const [, mintReceiver] = accounts
+  const [, , secondMintReceiver] = accounts
+  const [, , wrongOwner] = accounts
+  const [, , , receiver] = accounts
 
-    const account2 = accounts[2]
-    const tokenId2 = 3;
-    const tokenUri2 = "Venusaur";
+  beforeEach(async () => {
+    token = await Pokemon.new(name, symbol)
+  })
 
-    const account3 = accounts[3]
-
-    it(' should be able to deploy and mint ERC721 token', async () => {
-        token = await Pokemon.new(name, symbol)
-        await token.mintUniqueTokenTo(account1, tokenId1, tokenUri1, {from: accounts[0]})
-
-        expect(await token.symbol()).to.equal(symbol)
-        expect(await token.name()).to.equal(name)
+  describe('Deploy and minting: ', async () => {
+    it('should be able to deploy and mint ERC721 token', async () => {
+      const tokenId = 1
+      await token.mintUniqueTokenTo(mintReceiver, tokenId, `${uriUrl}/${tokenId}`)
+      expect(await token.symbol()).to.equal(symbol)
+      expect(await token.name()).to.equal(name)
+      expect(await token.ownerOf(tokenId)).to.equal(mintReceiver)
+      expect(await token.tokenURI(tokenId)).to.equal(`${uriUrl}/${tokenId}`)
     })
-
-    it(' should be unique', async () => {
-        const duplicateTokenID = token.mintUniqueTokenTo(account2, tokenId1, tokenUri2, {from: accounts[0]})
-        expect(duplicateTokenID).to.be.rejectedWith(/VM Exception while processing transaction: revert/)
+    it('should be impossible to mint same tokenId unique', async () => {
+      const tokenId = 1
+      await token.mintUniqueTokenTo(mintReceiver, tokenId, `${uriUrl}/${tokenId}`)
+      try {
+        await token.mintUniqueTokenTo(secondMintReceiver, tokenId, `${uriUrl}/${tokenId}`)
+      } catch (e) {
+        assert.include(e.message, 'revert', 'Unique tokens can be duplicated')
+      }
     })
-
-    it(' should allow creation of multiple unique tokens and manage ownership', async () => {
-        const additionalToken = await token.mintUniqueTokenTo(account2, tokenId2, tokenUri2, {from: accounts[0]})
-        expect(Number(await token.totalSupply())).to.equal(2)
-
-        expect(await token.exists(tokenId1)).to.be.true
-        expect(await token.exists(tokenId2)).to.be.true
-        expect(await token.exists(9999)).to.be.false
-
-        expect(await token.ownerOf(tokenId1)).to.equal(account1)
-        expect(await token.ownerOf(tokenId2)).to.equal(account2)
+  })
+  describe('Ownership and transfer: ', async () => {
+    beforeEach(async () => {
+      const min = 1
+      const max = 3
+      const mintPromises = []
+      for (let currentItemId = min; currentItemId <= max; currentItemId += 1) {
+        mintPromises.push(token.mintUniqueTokenTo(mintReceiver, currentItemId, `${uriUrl}/${currentItemId}`))
+      }
+      await Promise.all(mintPromises)
     })
-
-    it(' should allow safe transfers', async () => {
-        const unownedTokenId = token.safeTransferFrom(account2, account3, tokenId1, {from: accounts[2]})
-        expect(unownedTokenId).to.be.rejectedWith(/VM Exception while processing transaction: revert/)
-
-        const wrongOwner = token.safeTransferFrom(account1, account3, tokenId2, {from: accounts[1]})
-        expect(wrongOwner).to.be.rejectedWith(/VM Exception while processing transaction: revert/)
-
-        const wrongFromGas = token.safeTransferFrom(account2, account3, tokenId2, {from: accounts[1]})
-        expect(wrongFromGas).to.be.rejectedWith(/VM Exception while processing transaction: revert/)
-
-        await token.safeTransferFrom(account2, account3, tokenId2, {from: accounts[2]})
-        expect(await token.ownerOf(tokenId2)).to.equal(account3)
+    it('should allow creation of multiple unique tokens and manage ownership', async () => {
+      expect(Number(await token.totalSupply())).to.equal(3)
+      expect(await token.exists(1)).to.equal(true)
+      expect(await token.exists(2)).to.equal(true)
+      expect(await token.exists(3)).to.equal(true)
+      expect(await token.exists(9999)).to.equal(false)
+      expect(await token.ownerOf(1)).to.equal(mintReceiver)
+      expect(await token.ownerOf(2)).to.equal(mintReceiver)
+      expect(await token.ownerOf(3)).to.equal(mintReceiver)
     })
+    describe('Fail cases: ', async () => {
+      it('should not allow safe transfers', async () => {
+        try {
+          await token.safeTransferFrom(wrongOwner, receiver, 1, {
+            from: wrongOwner,
+          })
+        } catch (e) {
+          assert.include(e.message, 'revert', 'Can move not owned token')
+        }
+
+        try {
+          await token.safeTransferFrom(mintReceiver, receiver, 4, {
+            from: mintReceiver,
+          })
+        } catch (e) {
+          assert.include(e.message, 'revert', 'Can move not exsting token')
+        }
+      })
+    })
+    describe('Success cases: ', async () => {
+      it('should allow safe transfers', async () => {
+        await token.safeTransferFrom(mintReceiver, receiver, 2, {
+          from: mintReceiver,
+        })
+        expect(await token.ownerOf(2)).to.equal(receiver)
+      })
+    })
+  })
 })
