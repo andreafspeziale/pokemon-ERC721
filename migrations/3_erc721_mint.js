@@ -1,34 +1,47 @@
+/* eslint no-undef: 1 */
 const Pokemon = artifacts.require('./Pokemon.sol')
-const colors  = require('colors')
+const colors = require('colors')
 const config = require('../config/config')
-const rp = require('request-promise')
+
 let receiver
 
-module.exports = async function (deployer, network, accounts) {
-    const pokemonToken = await Pokemon.deployed()
-    network === 'development' ? receiver = accounts[1] : receiver = config.networks[network].receiver
-    console.log(colors.magenta(`[receiver address]: ${receiver}`))
+module.exports = (deployer, network, accounts) => Pokemon.deployed().then((instance) => {
+  // retriving pokemon token instance
+  const pokemonToken = instance
+  // setting the receiver of the all minted tokens
+  if (network === 'development') {
+    [, receiver] = accounts
+  } else {
+    [receiver] = config.networks[network]
+  }
+  console.log(colors.magenta(`[receiver address]: ${receiver}`))
+  // setting the range for pokemons to be minted
+  const { min } = config.pokemon
+  const { max } = config.pokemon
+  const { uriUrl } = config.pokemon
 
-    const min = config.pokemon.min
-    const max = config.pokemon.max
-    const endpoint = config.pokemon.endpoint
-    const pokemonItem = Math.floor(Math.random() * (max - min + 1)) + min
-    const pokemon = await rp({
-        uri: endpoint + 'pokemon/' + pokemonItem,
-        headers: {
-            'User-Agent': 'Request-Promise'
-        },
-        json: true
-    })
+  const mintingPromises = []
 
-    const mintTx = await pokemonToken.mintUniqueTokenTo(receiver, pokemonItem, pokemon.name)
+  // for the setted range mint a token composed by:
+  //  - its unique ID
+  //  - a meta URI url connected to a service returning a JSON schema defined as follows
+  //    - {
+  //        "name": "Bulbasaur",
+  //        "description": "Pokemon description",
+  //        "image": "http://localhost:3000/assets/images/1.png",
+  //        "meta": "http://localhost:3000/api/pokemons/1/meta"
+  //      }
+  for (let currentItemId = min; currentItemId <= max; currentItemId += 1) {
+    mintingPromises.push(
+      pokemonToken.mintUniqueTokenTo(
+        receiver,
+        currentItemId,
+        `${uriUrl}/${currentItemId}`,
+      ),
+    )
+  }
 
-    if(mintTx.receipt.status === '0x1' || mintTx.receipt.status === '1')
-        console.log(colors.green(`[mintTx]: success`))
-    else
-        console.log(colors.red(`[mintTx]: fail`))
-
-    console.log(colors.green(`[mintTx]: ${mintTx.receipt.status === '0x1' ? 'success' : 'fail'}`))
-    console.log(colors.magenta(`[pokemonItem minted]: ${pokemonItem}`))
-    console.log(colors.magenta(`[pokemonName minted]: ${pokemon.name}`))
-};
+  Promise.all(mintingPromises).then(() => {
+    console.log('All tokens has been minted during the migration')
+  })
+})
