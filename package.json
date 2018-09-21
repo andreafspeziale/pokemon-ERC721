@@ -7,13 +7,16 @@
     "test": "test"
   },
   "scripts": {
-    "ganache": "ganache-cli --port 7545 -i 47",
-    "migrate:parity": "truffle migrate --network parity --reset",
-    "migrate:development": "truffle migrate --network development --reset",
-    "test:parity": "truffle test --network parity",
-    "test:development": "truffle test --network development",
-    "mint:parity": "truffle exec ./scripts/mint.js --network parity",
-    "mint:development": "truffle exec ./scripts/mint.js --network development"
+    "ganache": "./node_modules/.bin/ganache-cli --port 7545 -i 47",
+    "migrate:parity": "./node_modules/.bin/truffle migrate --network parity --reset",
+    "migrate:development": "./node_modules/.bin/truffle migrate --network development --reset",
+    "test:parity": "./node_modules/.bin/truffle test --network parity",
+    "test:development": "./node_modules/.bin/truffle test --network development",
+    "mint:parity": "./node_modules/.bin/truffle exec ./scripts/mint.js --network parity",
+    "mint:development": "./node_modules/.bin/truffle exec ./scripts/mint.js --network development",
+    "solium:d": "./node_modules/.bin/solium -c .soliumrc.json -d",
+    "solium:f": "./node_modules/.bin/solium -c .soliumrc.json -f",
+    "solium:all": "./node_modules/.bin/solium -c .soliumrc.json -d ./contracts/"
   },
   "keywords": [
     "ethereum",
@@ -24,13 +27,14 @@
   "author": "andreafspeziale",
   "license": "ISC",
   "devDependencies": {
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "ganache-cli": "^6.1.6",
-    "truffle": "^4.1.13"
+    "truffle": "^4.1.13",
+    "solium": "^1.1.8",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0"
   },
   "dependencies": {
     "colors": "^1.3.1",
