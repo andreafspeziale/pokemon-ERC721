@@ -1,0 +1,13 @@
+module.exports = {
+  pokemon: {
+    min: POKEMON_MINT_RANGE_START, // (e.g 1)
+    max: POKEMON_MINT_RANGE_END, // (e.g 151)
+    extraMax: EXTRA_POKEMON_MINT_RANGE_END, // for extra minting by scripts (e.g 201)
+    uriUrl: 'http://localhost:3000/api/pokemons', // check readme
+  },
+  networks: {
+    parity: {
+      receiver: 'MINTING_RECEIVER_ON_OTHER_NETWORK',
+    },
+  },
+}
