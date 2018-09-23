@@ -4,7 +4,7 @@
 ## Full working sample
 This project is composed by two components:
 - **Truffle project**
-- **App** - [repository](https://github.com)
+- **App** - [repository](https://github.com/andreafspeziale/pokemon-ERC721-app)
 
 The *Truffle project* contains the smart contracts and all the tools for the contracts deployment and testing.
 
@@ -33,7 +33,7 @@ module.exports = {
 - `$ npm run ganache` | Save the private keys of the displayed accounts, you will need to import it into `Metamask`
 - `$ npm run migrate:development`
 
-At this point leaving all up and running move to the [*Pokemon App* README](https://github.com) and follow the instructions.
+At this point leaving all up and running move to the [*Pokemon App* README](https://github.com/andreafspeziale/pokemon-ERC721-app) and follow the instructions.
 
 ## System used
 > System used during the development of the project
