@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "ganache": "./node_modules/.bin/ganache-cli --port 7545 -i 47",
+    "ganache": "./node_modules/.bin/ganache-cli --p 7545 -i 47 -b 1",
     "migrate:parity": "./node_modules/.bin/truffle migrate --network parity --reset",
     "migrate:development": "./node_modules/.bin/truffle migrate --network development --reset",
     "test:parity": "./node_modules/.bin/truffle test --network parity",
