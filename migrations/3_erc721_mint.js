@@ -1,4 +1,5 @@
 /* eslint no-undef: 1 */
+/* global artifacts, web3 */
 const Pokemon = artifacts.require('./Pokemon.sol')
 const colors = require('colors')
 const config = require('../config/config')
@@ -9,10 +10,10 @@ module.exports = (deployer, network, accounts) => Pokemon.deployed().then((insta
   // retriving pokemon token instance
   const pokemonToken = instance
   // setting the receiver of the all minted tokens
-  if (network === 'development') {
-    [, receiver] = accounts
+  if (config.networks[network] && web3.isAddress(config.networks[network].receiver)) {
+    receiver = config.networks[network].receiver
   } else {
-    [receiver] = config.networks[network]
+    [, receiver] = accounts
   }
   console.log(colors.magenta(`[receiver address]: ${receiver}`))
   // setting the range for pokemons to be minted

@@ -1,4 +1,5 @@
 /* eslint no-undef: 1 */
+/* global artifacts */
 const Pokemon = artifacts.require('./Pokemon.sol')
 const colors = require('colors')
 

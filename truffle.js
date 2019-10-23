@@ -11,7 +11,7 @@ module.exports = {
       network_id: '47',
     },
     parity: {
-      host: 'wally-api-dev.undo.it',
+      host: 'dev-shared.eidoo.io',
       port: 8545,
       network_id: '8995',
       gas: 4700000,
