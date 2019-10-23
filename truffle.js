@@ -1,4 +1,9 @@
 module.exports = {
+  compilers: {
+    solc: {
+      version: '0.4.24+commit.e67f0147',
+    },
+  },
   networks: {
     development: {
       host: '127.0.0.1',
